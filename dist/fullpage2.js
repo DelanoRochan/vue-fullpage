@@ -157,137 +157,122 @@
           var _this2 = this;
 
           this.prevIndex = this.curIndex;
-          if ("ontouchstart" in document && this.opts.touchEnabled) {
+          if ("ontouchstart" in document) {
             /// touch ///
-            addEventListener(el, "touchstart", function(e) {
-              if (_this2.opts.movingFlag) {
-                return false;
-              }
-              _this2.startX = e.targetTouches[0].pageX;
-              _this2.startY = e.targetTouches[0].pageY;
-            });
-            addEventListener(el, "touchend", function(e) {
-              //e.preventDefault();
-              if (_this2.opts.movingFlag) {
-                return false;
-              }
-              var preIndex = _this2.curIndex;
-              var dir = _this2.opts.dir;
-              var sub = (_this2.direction =
-                dir === "v"
-                  ? (e.changedTouches[0].pageY - _this2.startY) / _this2.height
-                  : (e.changedTouches[0].pageX - _this2.startX) / _this2.width);
-              var der =
-                sub > _this2.opts.der ? -1 : sub < -_this2.opts.der ? 1 : 0;
-              var curIndex = der + _this2.curIndex;
-              _this2.moveTo(curIndex, true);
-            });
-            addEventListener(document.body, "touchmove", function(e) {
-              var overflow = _this2.opts.overflow;
-
-              var currentPage = _this2.pageEles[_this2.curIndex];
-              if (overflow === "hidden") {
-                //e.preventDefault();
-                return false;
-              } else {
-                var currentTarget = e.target;
-
-                while (currentTarget) {
-                  if (
-                    (overflow === "scroll" && currentTarget === currentPage) ||
-                    (overflow !== "scroll" && currentTarget !== currentPage)
-                  ) {
-                    if (
-                      !Fullpage.iSWhetherEnds(currentTarget, _this2.direction)
-                    ) {
-                      return;
-                    }
-                  }
-
-                  currentTarget = currentTarget.parentNode;
-                }
-                e.preventDefault();
-              }
-            });
+            // addEventListener(el, "touchstart", function (e) {
+            //     if (_this2.opts.movingFlag) {
+            //         return false;
+            //     }
+            //     _this2.startX = e.targetTouches[0].pageX;
+            //     _this2.startY = e.targetTouches[0].pageY;
+            // });
+            // addEventListener(el, "touchend", function (e) {
+            //     //e.preventDefault();
+            //     if (_this2.opts.movingFlag) {
+            //         return false;
+            //     }
+            //     var preIndex = _this2.curIndex;
+            //     var dir = _this2.opts.dir;
+            //     var sub = _this2.direction = dir === "v" ? (e.changedTouches[0].pageY - _this2.startY) / _this2.height : (e.changedTouches[0].pageX - _this2.startX) / _this2.width;
+            //     var der = sub > _this2.opts.der ? -1 : sub < -_this2.opts.der ? 1 : 0;
+            //     var curIndex = der + _this2.curIndex;
+            //     _this2.moveTo(curIndex, true);
+            // });
+            // addEventListener(document.body, "touchmove", function (e) {
+            //     var overflow = _this2.opts.overflow;
+            //     var currentPage = _this2.pageEles[_this2.curIndex];
+            //     if (overflow === "hidden") {
+            //         //e.preventDefault();
+            //         return false;
+            //     } else {
+            //         var currentTarget = e.target;
+            //         while (currentTarget) {
+            //             if (overflow === "scroll" && currentTarget === currentPage || overflow !== "scroll" && currentTarget !== currentPage) {
+            //                 if (!Fullpage.iSWhetherEnds(currentTarget, _this2.direction)) {
+            //                     return;
+            //                 }
+            //             }
+            //             currentTarget = currentTarget.parentNode;
+            //         }
+            //         e.preventDefault();
+            //     }
+            // });
           }
-          if (this.opts.scrollEnabled) {
-            //else {
-            var isMousedown = false;
-            addEventListener(el, "mousedown", function(e) {
-              if (_this2.opts.movingFlag) {
-                return false;
-              }
-              isMousedown = true;
-              _this2.startX = e.pageX;
-              _this2.startY = e.pageY;
-            });
-            addEventListener(el, "mouseup", function(e) {
-              isMousedown = false;
-            });
-            addEventListener(el, "mousemove", function(e) {
-              //e.preventDefault();
-              if (_this2.opts.movingFlag || !isMousedown) {
-                return false;
-              }
-              var dir = _this2.opts.dir;
-              var sub = (_this2.direction =
-                dir === "v"
-                  ? (e.pageY - _this2.startY) / _this2.height
-                  : (e.pageX - _this2.startX) / _this2.width);
-              var der =
-                sub > _this2.opts.der ? -1 : sub < -_this2.opts.der ? 1 : 0;
-              var curIndex = der + _this2.curIndex;
-              _this2.moveTo(curIndex, true);
-            });
+          //else {
+          var isMousedown = false;
+          addEventListener(el, "mousedown", function(e) {
+            if (_this2.opts.movingFlag) {
+              return false;
+            }
+            isMousedown = true;
+            _this2.startX = e.pageX;
+            _this2.startY = e.pageY;
+          });
+          addEventListener(el, "mouseup", function(e) {
+            isMousedown = false;
+          });
+          addEventListener(el, "mousemove", function(e) {
+            //e.preventDefault();
+            if (_this2.opts.movingFlag || !isMousedown) {
+              return false;
+            }
+            var dir = _this2.opts.dir;
+            var sub = (_this2.direction =
+              dir === "v"
+                ? (e.pageY - _this2.startY) / _this2.height
+                : (e.pageX - _this2.startX) / _this2.width);
+            var der =
+              sub > _this2.opts.der ? -1 : sub < -_this2.opts.der ? 1 : 0;
+            var curIndex = der + _this2.curIndex;
+            _this2.moveTo(curIndex, true);
+          });
 
-            var debounceTimer = void 0,
-              interval = 1200,
+          var debounceTimer = void 0,
+            interval = 1200,
+            debounce = true;
+          // fixed firefox DOMMouseScroll closed #1.
+          var mousewheelType =
+            document.mozFullScreen !== undefined
+              ? "DOMMouseScroll"
+              : "mousewheel";
+
+          addEventListener(el, mousewheelType, function(e) {
+            if (_this2.opts.movingFlag) {
+              return false;
+            }
+            if (!debounce) {
+              return;
+            }
+            debounce = false;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function() {
               debounce = true;
-            // fixed firefox DOMMouseScroll closed #1.
-            var mousewheelType =
-              document.mozFullScreen !== undefined
-                ? "DOMMouseScroll"
-                : "mousewheel";
+            }, interval);
+            var dir = _this2.opts.dir;
+            // Compatible DOMMouseScroll event.detail
+            // see http://www.javascriptkit.com/javatutors/onmousewheel.shtml
+            var detail = e.wheelDelta ? e.wheelDelta / 120 : e.detail;
+            //let detail = e.detail ? e.detail * -120 : e.wheelDelta;
+            // console.log(e.wheelDelta);
+            //Only support Y
+            var der = (_this2.direction = detail > 0 ? -1 : detail < 0 ? 1 : 0);
+            var curIndex = der + _this2.curIndex;
+            _this2.moveTo(curIndex, true);
 
-            addEventListener(el, mousewheelType, function(e) {
-              if (_this2.opts.movingFlag) {
-                return false;
-              }
-              if (!debounce) {
-                return;
-              }
-              debounce = false;
-              clearTimeout(debounceTimer);
-              debounceTimer = setTimeout(function() {
-                debounce = true;
-              }, interval);
-              var dir = _this2.opts.dir;
-              // Compatible DOMMouseScroll event.detail
-              // see http://www.javascriptkit.com/javatutors/onmousewheel.shtml
-              var detail = e.wheelDelta ? e.wheelDelta / 120 : e.detail;
-              //let detail = e.detail ? e.detail * -120 : e.wheelDelta;
-              // console.log(e.wheelDelta);
-              //Only support Y
-              var der = (_this2.direction =
-                detail > 0 ? -1 : detail < 0 ? 1 : 0);
-              var curIndex = der + _this2.curIndex;
-              _this2.moveTo(curIndex, true);
+            if (e.preventDefault) {
+              //disable default wheel action of scrolling page
+              e.preventDefault();
+            } else {
+              return false;
+            }
+          });
+          //}
 
-              if (e.preventDefault) {
-                //disable default wheel action of scrolling page
-                e.preventDefault();
-              } else {
-                return false;
-              }
-            });
-            //}
-
-            addEventListener(window, "resize", function() {
-              if (el.offsetHeight != _this2.height) {
-                _this2.resize();
-              }
-            });
-          }
+          addEventListener(window, "resize", function() {
+            if (el.offsetHeight != _this2.height) {
+              _this2.resize();
+            }
+          });
         }
       },
       {
@@ -492,7 +477,7 @@
     der: 0.1,
     /**
      *
-     * @property {boolean} default:false
+     * @property {boolean} defualt:false
      */
     movingFlag: false,
     /**
@@ -530,18 +515,8 @@
      */
     overflow: "hidden",
     /**
-     *
-     * @property {boolean} default:true
-     */
-    touchEnabled: true,
-    /**
-     *
-     * @property {boolean} default:true
-     */
-    scrollEnabled: true,
-    /**
      * disabled
-     * @property {boolean} default: false
+     * @property {boolean}  default: false
      */
     disabled: false
   };
